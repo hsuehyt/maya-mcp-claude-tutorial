@@ -137,27 +137,33 @@ To disable: disable_commandport(7001)
 
 Use the bundled script rather than writing your own `cmds.commandPort(...)` line. It handles a Maya 2024-specific response quirk and binds to localhost only.
 
-### Optional: open the port automatically every time Maya starts
+### Recommended: open the port automatically every time Maya starts
 
-Copy `enable_commandport.py` into your Maya scripts folder:
+The source zip already includes a ready-made **`scripts/userSetup.py`**. It is self-contained (it doesn't need `enable_commandport.py`), waits until Maya has finished loading, opens `localhost:7001`, and skips the port if it's already open.
 
-```
-C:\Users\<you>\Documents\maya\<version>\scripts\
-```
+1. Check whether you already have a `userSetup.py` in your Maya scripts folder:
 
-Then create (or edit) `userSetup.py` in that same folder:
+   ```
+   C:\Users\<you>\Documents\maya\<version>\scripts\
+   ```
 
-```python
-import maya.utils
+   (e.g. `C:\Users\<you>\Documents\maya\2026\scripts\`)
 
-def _start_maya_mcp_port():
-    import enable_commandport
-    enable_commandport.enable_commandport()
+2. **If there is none:** copy both `userSetup.py` and `enable_commandport.py` from the zip's `scripts` folder into it. `enable_commandport.py` isn't required for auto-start, but it's handy if you ever need to reopen the port by hand.
 
-maya.utils.executeDeferred(_start_maya_mcp_port)
-```
+   **If you already have one:** don't overwrite it. Append the contents of the bundled `userSetup.py` to the end of your existing file.
 
-Restart Maya. The Script Editor should print `commandPort opened on localhost:7001` on startup.
+3. Restart Maya. The Script Editor should show this line during startup:
+
+   ```
+   [MCP] commandPort opened on :7001
+   ```
+
+   ![Maya startup log showing the MCP commandPort opened automatically](images/05-maya-autostart.png)
+
+Settings such as the port number are at the top of the bundled `userSetup.py` (`DEFAULT_PORT = 7001`). If you change it, change the extension's *Maya commandPort* setting to match.
+
+Once auto-start works, you can delete the unzipped `GG_MayaMCP-<version>` folder. Claude Desktop runs the extension from its own install location.
 
 ---
 
@@ -228,7 +234,7 @@ Just describe what you want. Claude picks the right tools.
 No. The port belongs to the running Maya program, not the scene. It stays open when you open, create or switch scenes.
 
 **When *do* I need to run it again?**
-Only after you close and reopen Maya (unless you set up `userSetup.py`, see step 5).
+Only after you close and reopen Maya, and not at all if you installed the bundled `userSetup.py` (see step 5).
 
 **Do I need to start a new Claude chat after restarting Maya?**
 No. Run the script in Maya, and the next request in any chat reconnects automatically. Any new chat also has the Maya tools while the extension is enabled.
